@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商务英语词汇 · 点读 + 游戏卡</title>
+<style>
+:root{
+  --bg:#0f1220; --card:#1a1f35; --card2:#232a47; --text:#eef1ff;
+  --muted:#9aa3c7; --accent:#6c8cff; --accent2:#43d9a3; --warn:#ffb86c;
+  --wrong:#ff6b81; --shadow:0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh}
+header{padding:20px 16px 8px;text-align:center}
+header h1{font-size:1.35rem;background:linear-gradient(90deg,#6c8cff,#43d9a3);-webkit-background-clip:text;background-clip:text;color:transparent}
+header p{color:var(--muted);font-size:.85rem;margin-top:4px}
+nav{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:14px;position:sticky;top:0;background:rgba(15,18,32,.92);backdrop-filter:blur(8px);z-index:10;border-bottom:1px solid #262c4a}
+nav button{background:var(--card);border:1px solid #2c3355;color:var(--text);padding:8px 14px;border-radius:20px;cursor:pointer;font-size:.9rem;transition:.2s}
+nav button.active{background:var(--accent);border-color:var(--accent);color:#fff}
+main{max-width:860px;margin:0 auto;padding:16px}
+.hidden{display:none!important}
+
+/* ---------- 词表 ---------- */
+.wlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.wcard{background:var(--card);border:1px solid #2a3052;border-radius:12px;padding:12px 14px;cursor:pointer;transition:.15s}
+.wcard:hover{background:var(--card2);transform:translateY(-2px);box-shadow:var(--shadow)}
+.wcard .w{font-size:1.15rem;font-weight:700;color:#aebcff;display:flex;align-items:center;gap:6px}
+.wcard .w .sp{font-size:.85rem;color:var(--muted);font-weight:400}
+.wcard .ipa{color:var(--accent2);font-size:.8rem;margin-top:2px;font-family:Georgia,serif}
+.wcard .zh{color:var(--warn);font-size:.82rem;margin-top:2px}
+.wcard .ex{color:var(--muted);font-size:.8rem;margin-top:6px;line-height:1.45;border-top:1px dashed #333b62;padding-top:6px}
+.speak-ico{opacity:.55;font-size:.9rem}
+.wcard:hover .speak-ico{opacity:1}
+
+/* ---------- 闪卡 ---------- */
+.flash-wrap{text-align:center;padding:10px 0}
+.flash-card{background:linear-gradient(145deg,#232a47,#1a1f35);border:1px solid #323a63;border-radius:20px;min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;box-shadow:var(--shadow);transition:transform .4s;position:relative;padding:20px}
+.flash-card .fw{font-size:2.2rem;font-weight:800;color:#aebcff}
+.flash-card .fipa{color:var(--accent2);font-family:Georgia,serif}
+.flash-card .fzh{color:var(--warn);font-size:1.1rem}
+.flash-card .fex{color:var(--muted);font-size:.9rem;line-height:1.5;max-width:520px}
+.flash-card .hint{position:absolute;bottom:12px;color:#5a6288;font-size:.75rem}
+.flash-card .daytag{position:absolute;top:12px;left:14px;background:#2c3355;color:var(--muted);font-size:.7rem;padding:3px 10px;border-radius:12px}
+.flash-btns{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.flash-btns button{padding:10px 22px;border-radius:22px;border:none;cursor:pointer;font-size:.95rem;font-weight:600}
+.btn-know{background:var(--accent2);color:#08301f}
+.btn-unknow{background:var(--wrong);color:#fff}
+.btn-skip{background:var(--card2);color:var(--text);border:1px solid #3a4370!important}
+.btn-primary{background:var(--accent);color:#fff}
+.progress{height:8px;background:#262c4a;border-radius:4px;overflow:hidden;margin:14px auto;max-width:500px}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,#6c8cff,#43d9a3);transition:width .3s}
+.pcount{color:var(--muted);font-size:.85rem;text-align:center}
+
+/* ---------- 测验 ---------- */
+.quiz-box{background:var(--card);border:1px solid #2a3052;border-radius:16px;padding:24px;margin-top:10px}
+.quiz-q{font-size:1.25rem;font-weight:700;text-align:center;margin-bottom:18px}
+.quiz-q .speaker{cursor:pointer;color:var(--accent);font-size:1.6rem;margin-right:8px;vertical-align:middle}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opts button{background:var(--card2);border:1px solid #3a4370;color:var(--text);padding:14px;border-radius:10px;cursor:pointer;font-size:1rem;transition:.15s}
+.opts button:hover{border-color:var(--accent)}
+.opts button.right{background:rgba(67,217,163,.18);border-color:var(--accent2)}
+.opts button.wrong{background:rgba(255,107,129,.18);border-color:var(--wrong)}
+.quiz-feedback{text-align:center;margin-top:14px;min-height:24px;font-weight:600}
+.quiz-feedback .ok{color:var(--accent2)}
+.quiz-feedback .no{color:var(--wrong)}
+.quiz-bar{display:flex;justify-content:space-between;color:var(--muted);font-size:.85rem;margin-bottom:14px}
+.spell-input{width:100%;padding:14px;font-size:1.2rem;border-radius:10px;border:1px solid #3a4370;background:#141830;color:var(--text);text-align:center;letter-spacing:2px;outline:none}
+.spell-input:focus{border-color:var(--accent)}
+.result-box{text-align:center;padding:30px}
+.result-box .score{font-size:3rem;font-weight:800;background:linear-gradient(90deg,#6c8cff,#43d9a3);-webkit-background-clip:text;background-clip:text;color:transparent}
+.mode-pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:14px}
+.mode-pick .mp{background:var(--card);border:1px solid #2a3052;border-radius:14px;padding:18px;cursor:pointer;transition:.15s;text-align:center}
+.mode-pick .mp:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:var(--shadow)}
+.mode-pick .mp .ic{font-size:1.8rem}
+.mode-pick .mp .t{font-weight:700;margin-top:8px}
+.mode-pick .mp .d{color:var(--muted);font-size:.78rem;margin-top:4px}
+@media(max-width:520px){.opts{grid-template-columns:1fr}.flash-card .fw{font-size:1.7rem}}
+</style>
+</head>
+<body>
+<header>
+  <h1>💼 商务金融英语词汇 · 点读训练 + 游戏卡</h1>
+  <p>点击单词 / 例句即可发声（英式发音）· 51 词 · 三天计划</p>
+</header>
+<nav>
+  <button class="active" data-tab="list">📖 词表点读</button>
+  <button data-tab="flash">🃏 记忆闪卡</button>
+  <button data-tab="quiz">🎮 游戏测验</button>
+</nav>
+<main>
+  <section id="tab-list"><div class="wlist" id="wordList"></div></section>
+  <section id="tab-flash" class="hidden">
+    <div class="progress"><i id="flashBar" style="width:0%"></i></div>
+    <div class="pcount" id="flashCount"></div>
+    <div class="flash-wrap">
+      <div class="flash-card" id="flashCard"></div>
+      <div class="flash-btns">
+        <button class="btn-unknow" id="btnUnknown">😵 还不熟（再来）</button>
+        <button class="btn-know" id="btnKnow">😀 记住了</button>
+        <button class="btn-skip" id="btnRestart">🔄 重新开始</button>
+      </div>
+    </div>
+  </section>
+  <section id="tab-quiz" class="hidden">
+    <div id="quizHome">
+      <p style="color:var(--muted);text-align:center;margin-top:8px">选择一种游戏模式，加深记忆 👇</p>
+      <div class="mode-pick">
+        <div class="mp" data-mode="zh2en"><div class="ic">🇨🇳→🇬🇧</div><div class="t">看中文选英文</div><div class="d">四选一</div></div>
+        <div class="mp" data-mode="en2zh"><div class="ic">🇬🇧→🇨🇳</div><div class="t">看英文选中文</div><div class="d">四选一</div></div>
+        <div class="mp" data-mode="listen"><div class="ic">👂</div><div class="t">听音辨词</div><div class="d">点击播放读音</div></div>
+        <div class="mp" data-mode="spell"><div class="ic">⌨️</div><div class="t">拼写挑战</div><div class="d">听音拼单词</div></div>
+      </div>
+    </div>
+    <div id="quizPlay" class="hidden">
+      <div class="quiz-box">
+        <div class="quiz-bar"><span id="quizProg"></span><span id="quizScore">得分 0</span></div>
+        <div class="quiz-q" id="quizQ"></div>
+        <div id="quizOpts"></div>
+        <div class="quiz-feedback" id="quizFb"></div>
+        <div class="flash-btns"><button class="btn-skip" id="quizQuit">← 退出游戏</button></div>
+      </div>
+    </div>
+    <div id="quizResult" class="hidden"></div>
+  </section>
+</main>
+
+<script>
+const WORDS=[
+{w:"acquisition",ipa:"/ˌækwɪˈzɪʃn/",zh:"收购；获得",ex:"The company announced the acquisition of a rival firm.",day:1},
+{w:"merger",ipa:"/ˈmɜːdʒə(r)/",zh:"合并",ex:"The merger created the industry's largest operator.",day:1},
+{w:"stake",ipa:"/steɪk/",zh:"股份；赌注",ex:"The venture capital firm acquired a controlling stake.",day:1,pt:"controlling stake 控股"},
+{w:"auction",ipa:"/ˈɔːkʃn/",zh:"拍卖",ex:"The painting sold for a record sum at auction.",day:1},
+{w:"offering",ipa:"/ˈɒfərɪŋ/",zh:"发行（股票）",ex:"The initial public offering attracted substantial investment.",day:1,pt:"IPO 首次公开募股"},
+{w:"listing",ipa:"/ˈlɪstɪŋ/",zh:"上市",ex:"The company sought a stock market listing.",day:1},
+{w:"proceeds",ipa:"/ˈprəʊsiːdz/",zh:"（销售）收益",ex:"The proceeds from the sale funded expansion.",day:1},
+{w:"transaction",ipa:"/trænˈzækʃn/",zh:"交易",ex:"Online transactions required secure encryption.",day:1},
+{w:"portfolio",ipa:"/pɔːtˈfəʊliəʊ/",zh:"投资组合",ex:"Investors diversified their portfolios to reduce risk.",day:1},
+{w:"premium",ipa:"/ˈpriːmiəm/",zh:"溢价；保险费",ex:"The service commanded a premium price.",day:1},
+{w:"bonus",ipa:"/ˈbəʊnəs/",zh:"奖金",ex:"Staff earned bonuses this quarter.",day:1},
+{w:"earnings",ipa:"/ˈɜːnɪŋz/",zh:"收益；利润",ex:"The company reported record earnings for the fiscal year.",day:1},
+{w:"compensation",ipa:"/ˌkɒmpenˈseɪʃn/",zh:"补偿；赔偿金",ex:"Workers sought compensation for industrial injuries.",day:1},
+{w:"benchmark",ipa:"/ˈbentʃmɑːk/",zh:"基准",ex:"The treaty established a benchmark for international cooperation.",day:1},
+{w:"default",ipa:"/dɪˈfɔːlt/",zh:"违约；默认",ex:"The government risked default on its sovereign debt.",day:1},
+{w:"venture",ipa:"/ˈventʃə(r)/",zh:"风险企业；冒险",ex:"The diplomatic venture ultimately failed.",day:1},
+{w:"franchise",ipa:"/ˈfræntʃaɪz/",zh:"特许经营权；选举权",ex:"The reform extended the franchise to previously disenfranchised groups.",day:1},
+{w:"allocation",ipa:"/ˌæləˈkeɪʃn/",zh:"分配",ex:"The allocation became a contentious political issue.",day:2},
+{w:"allowance",ipa:"/əˈlaʊəns/",zh:"津贴；零用钱",ex:"Employees received a monthly allowance.",day:2},
+{w:"audit",ipa:"/ˈɔːdɪt/",zh:"审计",ex:"The annual audit revealed significant discrepancies.",day:2},
+{w:"bankruptcy",ipa:"/ˈbæŋkrʌptsi/",zh:"破产",ex:"The retailer filed for bankruptcy after years of losses.",day:2,pt:"file for bankruptcy 申请破产"},
+{w:"deficit",ipa:"/ˈdefɪsɪt/",zh:"赤字；不足",ex:"The organisation faced a substantial budget deficit.",day:2,pt:"budget/trade deficit"},
+{w:"surplus",ipa:"/ˈsɜːpləs/",zh:"盈余；剩余",ex:"The budget surplus allowed for increased spending.",day:2},
+{w:"expenditure",ipa:"/ɪkˈspendɪtʃə(r)/",zh:"支出；花费",ex:"Capital expenditure exceeded the approved budget.",day:2,pt:"capital expenditure 资本支出"},
+{w:"subsidy",ipa:"/ˈsʌbsədi/",zh:"补贴；津贴",ex:"The government withdrew subsidies for state enterprises.",day:2},
+{w:"burden",ipa:"/ˈbɜːdn/",zh:"负担",ex:"The tax burden fell disproportionately on the working class.",day:2,pt:"tax burden 税负"},
+{w:"privatisation",ipa:"/ˌpraɪvətaɪˈzeɪʃn/",zh:"私有化",ex:"The privatisation of state assets proved controversial.",day:2},
+{w:"capitalism",ipa:"/ˈkæpɪtəlɪzəm/",zh:"资本主义",ex:"The economist analysed the relationship between democracy and capitalism.",day:2},
+{w:"monopoly",ipa:"/məˈnɒpəli/",zh:"垄断",ex:"The state maintained a monopoly on force and authority.",day:2},
+{w:"quota",ipa:"/ˈkwəʊtə/",zh:"配额；限额",ex:"The fishing quota limited the annual catch.",day:2},
+{w:"stimulus",ipa:"/ˈstɪmjələs/",zh:"刺激；激励",ex:"The research provided a stimulus for debate.",day:2},
+{w:"boom",ipa:"/buːm/",zh:"繁荣；激增",ex:"The technology sector experienced an unprecedented boom.",day:2},
+{w:"prosperity",ipa:"/prɒˈsperəti/",zh:"繁荣；昌盛",ex:"Economic prosperity benefited shareholders considerably.",day:2},
+{w:"commerce",ipa:"/ˈkɒmɜːs/",zh:"商业；贸易",ex:"International commerce expanded rapidly.",day:3},
+{w:"commodity",ipa:"/kəˈmɒdəti/",zh:"商品；大宗商品",ex:"Oil became a strategic commodity in international relations.",day:3},
+{w:"cargo",ipa:"/ˈkɑːɡəʊ/",zh:"货物",ex:"The ship's cargo included valuable electronics.",day:3},
+{w:"shipping",ipa:"/ˈʃɪpɪŋ/",zh:"航运；运输",ex:"International shipping costs affected profit margins.",day:3},
+{w:"inventory",ipa:"/ˈɪnvəntri/",zh:"库存；清单",ex:"Warehouse staff conducted a complete inventory check.",day:3},
+{w:"enterprise",ipa:"/ˈentəpraɪz/",zh:"企业；事业",ex:"The enterprise employed over 10,000 staff globally.",day:3},
+{w:"marketplace",ipa:"/ˈmɑːkɪtpleɪs/",zh:"市场；集市",ex:"The marketplace became increasingly competitive.",day:3},
+{w:"rental",ipa:"/ˈrentl/",zh:"租赁；租金",ex:"Equipment rental provided a steady revenue stream.",day:3},
+{w:"subscription",ipa:"/səbˈskrɪpʃn/",zh:"订阅；订购",ex:"The company switched to a subscription model for its software.",day:3,pt:"subscription model 订阅模式"},
+{w:"productivity",ipa:"/ˌprɒdʌkˈtɪvəti/",zh:"生产力",ex:"New technology boosted productivity by 30%.",day:3,pt:"increase productivity"},
+{w:"turnover",ipa:"/ˈtɜːnəʊvə(r)/",zh:"营业额；人员流动率",ex:"Staff turnover increased due to poor conditions.",day:3,pt:"staff turnover 员工流失率"},
+{w:"tenure",ipa:"/ˈtenjə(r)/",zh:"任期；终身职位",ex:"The judge's tenure lasted twenty years.",day:3},
+{w:"mining",ipa:"/ˈmaɪnɪŋ/",zh:"采矿；挖掘",ex:"Data mining revealed useful patterns.",day:3,pt:"data mining 数据挖掘"},
+{w:"fundraising",ipa:"/ˈfʌndreɪzɪŋ/",zh:"筹款；募资",ex:"The charity launched an ambitious fundraising initiative.",day:3},
+{w:"gambling",ipa:"/ˈɡæmblɪŋ/",zh:"赌博",ex:"The government imposed strict regulations on gambling establishments.",day:3},
+{w:"toll",ipa:"/təʊl/",zh:"通行费；损失",ex:"The war took a terrible toll on the civilian population.",day:3,pt:"take a toll 造成损失"},
+{w:"tuition",ipa:"/tjuˈɪʃn/",zh:"学费；教学",ex:"University tuition fees increased annually.",day:3,pt:"tuition fees 学费"},
+{w:"endorsement",ipa:"/ɪnˈdɔːsmənt/",zh:"认可；背书",ex:"The proposal gained widespread endorsement.",day:2},
+];
+
+/* ---------- 发音 ---------- */
+let voiceUK=null;
+function pickVoice(){
+  const vs=speechSynthesis.getVoices();
+  voiceUK=vs.find(v=>v.lang==='en-GB')||vs.find(v=>v.lang.startsWith('en'))||null;
+}
+speechSynthesis.onvoiceschanged=pickVoice;pickVoice();
+function speak(text,rate=0.92){
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='en-GB';u.rate=rate;
+  if(voiceUK)u.voice=voiceUK;
+  speechSynthesis.speak(u);
+}
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+/* ---------- Tabs ---------- */
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  ['list','flash','quiz'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('hidden',t!==b.dataset.tab));
+});
+
+/* ---------- 词表点读 ---------- */
+const listEl=document.getElementById('wordList');
+WORDS.forEach(o=>{
+  const d=document.createElement('div');d.className='wcard';
+  d.innerHTML=`<div class="w"><span class="speak-ico">🔊</span>${o.w} <span class="sp">Day ${o.day}</span></div>
+  <div class="ipa">${o.ipa}</div><div class="zh">${o.zh}${o.pt?'　📌'+o.pt:''}</div>
+  <div class="ex"><span class="speak-ico">🔊</span> ${o.ex}</div>`;
+  d.querySelector('.w').onclick=e=>{e.stopPropagation();speak(o.w)};
+  d.querySelector('.ex').onclick=e=>{e.stopPropagation();speak(o.ex)};
+  listEl.appendChild(d);
+});
+
+/* ---------- 闪卡 ---------- */
+let fDeck=[],fIdx=0,fKnown=0;
+function flashStart(){
+  fDeck=shuffle(WORDS);fIdx=0;fKnown=0;flashRender();
+}
+function flashRender(){
+  const o=fDeck[fIdx],c=document.getElementById('flashCard');
+  c.innerHTML=`<div class="daytag">Day ${o.day} · 点击卡片翻面</div>
+    <div class="fw">🔊 ${o.w}</div>
+    <div class="fipa">${o.ipa}</div>
+    <div class="fzh">${o.zh}</div>
+    <div class="fex">💡 ${o.pt||''}</div>
+    <div class="hint">翻面看例句</div>`;
+  c.onclick=()=>{
+    c.innerHTML=`<div class="daytag">Day ${o.day}</div>
+      <div class="fw" style="cursor:pointer">🔊 ${o.w}</div>
+      <div class="fipa">${o.ipa} · ${o.zh}</div>
+      <div class="fex" style="cursor:pointer">🔊 ${o.ex}</div>
+      <div class="hint">点击 🔊 听发音</div>`;
+    c.querySelector('.fw').onclick=e=>{e.stopPropagation();speak(o.w)};
+    c.querySelector('.fex').onclick=e=>{e.stopPropagation();speak(o.ex)};
+    c.onclick=flashRenderBack.bind(null,o);
+  };
+  speak(o.w);
+  document.getElementById('flashBar').style.width=(fIdx/WORDS.length*100)+'%';
+  document.getElementById('flashCount').textContent=`${fIdx+1} / ${fDeck.length} · 已记住 ${fKnown}`;
+}
+function flashRenderBack(o){
+  const c=document.getElementById('flashCard');
+  c.innerHTML=`<div class="daytag">Day ${o.day}</div><div class="fw">🔊 ${o.w}</div><div class="fipa">${o.ipa} · ${o.zh}</div><div class="fex" style="cursor:pointer">🔊 ${o.ex}</div><div class="hint">点击 🔊 听发音</div>`;
+  c.querySelector('.fw').onclick=e=>{e.stopPropagation();speak(o.w)};
+  c.querySelector('.fex').onclick=e=>{e.stopPropagation();speak(o.ex)};
+}
+document.getElementById('btnKnow').onclick=()=>{fKnown++;fIdx<fDeck.length-1?(fIdx++,flashRender()):flashDone()};
+document.getElementById('btnUnknown').onclick=()=>{fDeck.push(fDeck[fIdx]);fIdx++;fIdx<fDeck.length?flashRender():flashDone()};
+document.getElementById('btnRestart').onclick=flashStart;
+function flashDone(){
+  const c=document.getElementById('flashCard');
+  c.innerHTML=`<div class="fw">🎉</div><div class="fzh">本轮完成！</div><div class="fex">记住 ${fKnown} 个词 · 点击"重新开始"再来一轮</div>`;
+  document.getElementById('flashBar').style.width='100%';
+  document.getElementById('flashCount').textContent=`完成！`;
+}
+
+/* ---------- 测验 ---------- */
+let qMode,qOrder,qIdx,qScore,qWrong=[];
+document.querySelectorAll('.mp').forEach(m=>m.onclick=()=>startQuiz(m.dataset.mode));
+document.getElementById('quizQuit').onclick=()=>{
+  document.getElementById('quizPlay').classList.add('hidden');
+  document.getElementById('quizResult').classList.add('hidden');
+  document.getElementById('quizHome').classList.remove('hidden');
+};
+function startQuiz(mode){
+  qMode=mode;qOrder=shuffle(WORDS);qIdx=0;qScore=0;qWrong=[];
+  document.getElementById('quizHome').classList.add('hidden');
+  document.getElementById('quizResult').classList.add('hidden');
+  document.getElementById('quizPlay').classList.remove('hidden');
+  qRender();
+}
+function qRender(){
+  if(qIdx>=qOrder.length)return qFinish();
+  const o=qOrder[qIdx];
+  document.getElementById('quizProg').textContent=`第 ${qIdx+1} / ${qOrder.length} 题`;
+  document.getElementById('quizScore').textContent=`得分 ${qScore}`;
+  document.getElementById('quizFb').innerHTML='';
+  const q=document.getElementById('quizQ'),opts=document.getElementById('quizOpts');
+  if(qMode==='zh2en'){
+    q.innerHTML=`哪个英文单词表示「<b style="color:var(--warn)">${o.zh}</b>」？`;
+    opts.innerHTML='';shuffle([o,...shuffle(WORDS.filter(x=>x!==o)).slice(0,3)]).forEach(x=>{
+      const b=document.createElement('button');b.textContent=x.w;
+      b.onclick=()=>answer(b,x===o,o,()=>speak(o.w));opts.appendChild(b);
+    });
+  }else if(qMode==='en2zh'){
+    q.innerHTML=`<span class="speaker" id="qSpeak">🔊</span>${o.w} <span style="color:var(--accent2);font-size:.9rem">${o.ipa}</span> 的意思是？`;
+    document.getElementById('qSpeak').onclick=()=>speak(o.w);
+    opts.innerHTML='';shuffle([o,...shuffle(WORDS.filter(x=>x!==o)).slice(0,3)]).forEach(x=>{
+      const b=document.createElement('button');b.textContent=x.zh;
+      b.onclick=()=>answer(b,x===o,o,()=>speak(o.w));opts.appendChild(b);
+    });
+  }else if(qMode==='listen'){
+    q.innerHTML=`<span class="speaker" id="qSpeak">🔊 点击播放读音</span><span style="font-size:.8rem;color:var(--muted)">（可反复听）</span>`;
+    document.getElementById('qSpeak').onclick=()=>speak(o.w);
+    setTimeout(()=>speak(o.w),300);
+    opts.innerHTML='';shuffle([o,...shuffle(WORDS.filter(x=>x!==o)).slice(0,3)]).forEach(x=>{
+      const b=document.createElement('button');b.textContent=x.w;
+      b.onclick=()=>answer(b,x===o,o,()=>speak(o.ex));opts.appendChild(b);
+    });
+  }else if(qMode==='spell'){
+    q.innerHTML=`<span class="speaker" id="qSpeak">🔊</span> 听发音，拼出单词（${o.zh}）`;
+    document.getElementById('qSpeak').onclick=()=>speak(o.w);
+    setTimeout(()=>speak(o.w),300);
+    opts.innerHTML=`<input class="spell-input" id="spellIn" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="输入英文后回车">
+      <div style="text-align:center;margin-top:12px"><button class="btn-primary" id="spellGo" style="padding:10px 30px;border-radius:22px;border:none;cursor:pointer">确认 ✓</button></div>`;
+    const inp=document.getElementById('spellIn');inp.focus();
+    const check=()=>{
+      const v=inp.value.trim().toLowerCase();
+      if(!v)return;
+      const ok=v===o.w;
+      document.getElementById('quizFb').innerHTML=ok
+        ?`<span class="ok">✅ 正确！${o.w} ${o.ipa} ${o.zh}</span>`
+        :`<span class="no">❌ 正确答案：<b>${o.w}</b> ${o.ipa} ${o.zh}</span>`;
+      if(ok)qScore++;else qWrong.push(o);
+      speak(o.w);
+      setTimeout(()=>{qIdx++;qRender()},2200);
+    };
+    inp.onkeydown=e=>{if(e.key==='Enter')check()};
+    document.getElementById('spellGo').onclick=check;
+  }
+}
+function answer(btn,ok,o,voice){
+  document.querySelectorAll('#quizOpts button').forEach(b=>b.disabled=true);
+  if(ok){btn.classList.add('right');qScore++;document.getElementById('quizFb').innerHTML=`<span class="ok">✅ 正确！${o.w} — ${o.zh}</span>`;}
+  else{btn.classList.add('wrong');qScore=Math.max(0,qScore);qWrong.push(o);
+    document.querySelectorAll('#quizOpts button').forEach(b=>{if(b.textContent===o.w||b.textContent===o.zh)b.classList.add('right')});
+    document.getElementById('quizFb').innerHTML=`<span class="no">❌ 正确答案：${o.w} — ${o.zh}</span>`;}
+  document.getElementById('quizScore').textContent=`得分 ${qScore}`;
+  voice&&voice();
+  setTimeout(()=>{qIdx++;qRender()},1800);
+}
+function qFinish(){
+  document.getElementById('quizPlay').classList.add('hidden');
+  const r=document.getElementById('quizResult');r.classList.remove('hidden');
+  const emoji=qScore>=qOrder.length*0.9?'🏆':qScore>=qOrder.length*0.7?'👍':'💪';
+  let wrongHtml=qWrong.length?`<div style="margin-top:20px;text-align:left"><b style="color:var(--warn)">📝 需要复习的词（点击听发音）：</b><div class="wlist" style="margin-top:10px">${
+    qWrong.map(o=>`<div class="wcard" onclick="speak('${o.w}')"><div class="w"><span class="speak-ico">🔊</span>${o.w}</div><div class="ipa">${o.ipa}</div><div class="zh">${o.zh}</div></div>`).join('')
+  }</div></div>`:'';
+  r.innerHTML=`<div class="quiz-box result-box"><div class="score">${emoji} ${qScore} / ${qOrder.length}</div>
+  <p style="color:var(--muted);margin-top:8px">${qScore>=qOrder.length*0.9?'太棒了！':qScore>=qOrder.length*0.7?'不错，再练一轮！':'加油，错词重点复习！'}</p>
+  ${wrongHtml}
+  <div class="flash-btns" style="margin-top:22px"><button class="btn-primary" onclick="startQuiz('${qMode}')">🔄 再来一轮</button>
+  <button class="btn-skip" onclick="document.getElementById('quizQuit').click()">← 返回</button></div></div>`;
+}
+flashStart();
+</script>
+</body>
+</html>
